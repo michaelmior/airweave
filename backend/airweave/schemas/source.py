@@ -91,6 +91,10 @@ class SourceBase(BaseModel):
             "from where they left off."
         ),
     )
+    supported_auth_providers: Optional[List[str]] = Field(
+        None,
+        description="List of auth provider short names that support this source (e.g., ['composio', 'pipedream'])",
+    )
 
     @field_serializer("output_entity_definition_ids")
     def serialize_output_entity_definition_ids(

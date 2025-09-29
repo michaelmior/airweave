@@ -54,6 +54,7 @@ class PipedreamAuthProvider(BaseAuthProvider):
     # Pipedream OAuth token endpoint
     TOKEN_ENDPOINT = "https://api.pipedream.com/v1/oauth/token"
 
+    # Sources that Pipedream does not support
     BLOCKED_SOURCES = [
         "confluence",
         "jira",
@@ -75,28 +76,11 @@ class PipedreamAuthProvider(BaseAuthProvider):
 
     # Mapping of Airweave source short names to Pipedream app names
     # Key: Airweave short name, Value: Pipedream app name_slug
+    # Only include mappings where names differ between Airweave and Pipedream
     SLUG_NAME_MAPPING = {
-        "google_drive": "google_drive",
-        "google_calendar": "google_calendar",
-        "notion": "notion",
-        "slack": "slack",
-        "github": "github",
-        "airtable": "airtable",
-        "stripe": "stripe",
-        "hubspot": "hubspot",
-        "salesforce": "salesforce",
-        "discord": "discord",
-        "twitter": "twitter",
-        "linkedin": "linkedin",
-        "facebook": "facebook",
-        "instagram": "instagram",
-        "youtube": "youtube",
-        "dropbox": "dropbox",
-        "box": "box",
-        "onedrive": "onedrive",
         "outlook_mail": "outlook",
         "outlook_calendar": "outlook",
-        # Add more mappings as needed
+        # Add more mappings as needed when names differ
     }
 
     @classmethod

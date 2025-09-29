@@ -78,11 +78,17 @@ async def list(
                 invalid_sources.append(f"{source.short_name} (invalid config_class: {str(e)})")
                 continue
 
+            # Get supported auth providers
+            supported_auth_providers = resource_locator.get_supported_auth_providers_for_source(
+                source.short_name
+            )
+
             # Create source model with all fields including auth_fields and config_fields
             source_dict = {
                 **{key: getattr(source, key) for key in source.__dict__ if not key.startswith("_")},
                 "auth_fields": auth_fields,
                 "config_fields": config_fields,
+                "supported_auth_providers": supported_auth_providers,
             }
 
             source_model = schemas.Source.model_validate(source_dict)
@@ -154,11 +160,17 @@ async def read(
                 status_code=500, detail=f"Invalid configuration for source {short_name}"
             ) from e
 
+        # Get supported auth providers
+        supported_auth_providers = resource_locator.get_supported_auth_providers_for_source(
+            source.short_name
+        )
+
         # Create a dictionary with all required fields including auth_fields and config_fields
         source_dict = {
             **{key: getattr(source, key) for key in source.__dict__ if not key.startswith("_")},
             "auth_fields": auth_fields,
             "config_fields": config_fields,
+            "supported_auth_providers": supported_auth_providers,
         }
 
         # Validate in one step with all fields present

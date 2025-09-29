@@ -1,7 +1,7 @@
 """Resource locator for platform resources."""
 
 import importlib
-from typing import Callable, Type
+from typing import Callable, List, Type
 
 from airweave import schemas
 from airweave.platform.auth_providers._base import BaseAuthProvider
@@ -135,6 +135,43 @@ class ResourceLocator:
             f"{PLATFORM_PATH}.entities.{entity_definition.module_name}"
         )
         return getattr(module, entity_definition.class_name)
+
+    @staticmethod
+    def get_supported_auth_providers_for_source(source_short_name: str) -> List[str]:
+        """Get auth providers that support the given source.
+
+        Args:
+            source_short_name: The short name of the source
+
+        Returns:
+            List of auth provider short names that support this source
+        """
+        supported = []
+
+        # Import auth provider classes
+        try:
+            from airweave.platform.auth_providers.composio import ComposioAuthProvider
+            from airweave.platform.auth_providers.pipedream import PipedreamAuthProvider
+
+            auth_provider_classes = [PipedreamAuthProvider, ComposioAuthProvider]
+
+            for auth_provider_class in auth_provider_classes:
+                short_name = auth_provider_class._short_name
+
+                # Check if source is blocked
+                blocked_sources = getattr(auth_provider_class, "BLOCKED_SOURCES", [])
+                if source_short_name in blocked_sources:
+                    continue
+
+                # If not blocked, it's supported
+                supported.append(short_name)
+
+        except ImportError:
+            # If auth providers can't be imported, return empty list
+            # This prevents the system from breaking if auth providers are missing
+            pass
+
+        return supported
 
 
 resource_locator = ResourceLocator()

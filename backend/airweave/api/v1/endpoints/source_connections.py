@@ -76,6 +76,39 @@ async def create(
     - True for: direct, oauth_token, auth_provider
     - False for: oauth_browser, oauth_byoc (these sync after authentication)
     """
+    # Validate auth provider support if using auth provider authentication
+    if hasattr(source_connection_in.authentication, "provider_readable_id"):
+        from airweave.platform.locator import resource_locator
+
+        # Get the auth provider connection to determine its type
+        provider_readable_id = source_connection_in.authentication.provider_readable_id
+        auth_provider_conn = await crud.connection.get_by_readable_id(
+            db, readable_id=provider_readable_id, ctx=ctx
+        )
+
+        if not auth_provider_conn:
+            raise HTTPException(
+                status_code=404, detail=f"Auth provider '{provider_readable_id}' not found"
+            )
+
+        # Get the actual auth provider short name from the connection
+        provider_short_name = auth_provider_conn.short_name
+
+        # Get supported auth providers for this source
+        supported_providers = resource_locator.get_supported_auth_providers_for_source(
+            source_connection_in.short_name
+        )
+
+        if provider_short_name not in supported_providers:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Source '{source_connection_in.short_name}' does not support "
+                    f"'{provider_short_name}' as an auth provider. "
+                    f"Supported providers: {supported_providers}"
+                ),
+            )
+
     # Check if organization is allowed to create a source connection
     await guard_rail.is_allowed(ActionType.SOURCE_CONNECTIONS)
 
