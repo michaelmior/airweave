@@ -10,6 +10,7 @@ from airweave import crud, schemas
 from airweave.api import deps
 from airweave.api.context import ApiContext
 from airweave.api.router import TrailingSlashRouter
+from airweave.core.auth_provider_service import auth_provider_service
 from airweave.core.guard_rail_service import GuardRailService
 from airweave.core.shared_models import ActionType
 from airweave.core.source_connection_service import source_connection_service
@@ -78,8 +79,6 @@ async def create(
     """
     # Validate auth provider support if using auth provider authentication
     if hasattr(source_connection_in.authentication, "provider_readable_id"):
-        from airweave.platform.locator import resource_locator
-
         # Get the auth provider connection to determine its type
         provider_readable_id = source_connection_in.authentication.provider_readable_id
         auth_provider_conn = await crud.connection.get_by_readable_id(
@@ -95,7 +94,7 @@ async def create(
         provider_short_name = auth_provider_conn.short_name
 
         # Get supported auth providers for this source
-        supported_providers = resource_locator.get_supported_auth_providers_for_source(
+        supported_providers = auth_provider_service.get_supported_providers_for_source(
             source_connection_in.short_name
         )
 

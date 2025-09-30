@@ -10,6 +10,7 @@ from airweave.api import deps
 from airweave.api.context import ApiContext
 from airweave.api.examples import create_single_source_response, create_source_list_response
 from airweave.api.router import TrailingSlashRouter
+from airweave.core.auth_provider_service import auth_provider_service
 from airweave.core.exceptions import NotFoundException
 from airweave.platform.configs._base import Fields
 from airweave.platform.locator import resource_locator
@@ -79,7 +80,7 @@ async def list(
                 continue
 
             # Get supported auth providers
-            supported_auth_providers = resource_locator.get_supported_auth_providers_for_source(
+            supported_auth_providers = auth_provider_service.get_supported_providers_for_source(
                 source.short_name
             )
 
@@ -161,7 +162,7 @@ async def read(
             ) from e
 
         # Get supported auth providers
-        supported_auth_providers = resource_locator.get_supported_auth_providers_for_source(
+        supported_auth_providers = auth_provider_service.get_supported_providers_for_source(
             source.short_name
         )
 

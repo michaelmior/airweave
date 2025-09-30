@@ -21,6 +21,63 @@ auth_provider_logger = logger.with_prefix("Auth Provider Service: ").with_contex
 class AuthProviderService:
     """Service for managing auth provider operations."""
 
+    def get_supported_providers_for_source(self, source_short_name: str) -> List[str]:
+        """Get auth providers that support the given source.
+
+        Args:
+            source_short_name: The short name of the source
+
+        Returns:
+            List of auth provider short names that support this source
+        """
+        supported = []
+
+        # Import and check each auth provider individually
+        # This ensures we can handle partial availability of providers
+        auth_provider_classes = []
+
+        # Try to import Pipedream
+        try:
+            from airweave.platform.auth_providers.pipedream import PipedreamAuthProvider
+
+            auth_provider_classes.append(PipedreamAuthProvider)
+        except ImportError:
+            # Skip if provider is not available
+            auth_provider_logger.debug("Pipedream provider not available")
+            pass
+
+        # Try to import Composio
+        try:
+            from airweave.platform.auth_providers.composio import ComposioAuthProvider
+
+            auth_provider_classes.append(ComposioAuthProvider)
+        except ImportError:
+            # Skip if provider is not available
+            auth_provider_logger.debug("Composio provider not available")
+            pass
+
+        # Add future providers here with individual try/except blocks
+
+        # Check each available provider
+        for auth_provider_class in auth_provider_classes:
+            short_name = auth_provider_class._short_name
+
+            # Check if source is blocked
+            blocked_sources = getattr(auth_provider_class, "BLOCKED_SOURCES", [])
+            if source_short_name in blocked_sources:
+                auth_provider_logger.debug(
+                    f"Source '{source_short_name}' is blocked by auth provider '{short_name}'"
+                )
+                continue
+
+            # If not blocked, it's supported
+            auth_provider_logger.debug(
+                f"Source '{source_short_name}' is supported by auth provider '{short_name}'"
+            )
+            supported.append(short_name)
+
+        return supported
+
     async def get_runtime_auth_fields_for_source(
         self, db: AsyncSession, source_short_name: str
     ) -> List[str]:
