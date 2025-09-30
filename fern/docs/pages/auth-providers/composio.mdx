@@ -81,10 +81,12 @@ client = AirweaveSDK(api_key="YOUR_API_KEY")
 source_connection = client.source_connections.create(
     name="Sales Team Google Drive",
     short_name="google_drive",
-    provider_readable_id="my-composio-connection-abc123",  # Your Composio auth provider id
-    provider_config={
-        "auth_config_id": "config_xyz789",  # From Composio dashboard
-        "account_id": "account_abc123"      # From Composio dashboard
+    authentication={
+        "provider_readable_id": "my-composio-connection-abc123",  # Your Composio auth provider id
+        "provider_config": {
+            "auth_config_id": "config_xyz789",  # From Composio dashboard
+            "account_id": "account_abc123"      # From Composio dashboard
+        }
     }
 )
 
@@ -102,10 +104,12 @@ const client = new AirweaveSDKClient({
 const sourceConnection = await client.sourceConnections.create({
   name: "Sales Team Google Drive",
   shortName: "google_drive",
-  providerReadableId: "my-composio-connection-abc123",  // Your Composio connection ID
-  providerConfig: {
-    authConfigId: "config_xyz789",  // From Composio dashboard
-    accountId: "account_abc123"      // From Composio dashboard
+  authentication: {
+    providerReadableId: "my-composio-connection-abc123",  // Your Composio connection ID
+    providerConfig: {
+      authConfigId: "config_xyz789",  // From Composio dashboard
+      accountId: "account_abc123"     // From Composio dashboard
+    }
   }
 });
 
@@ -119,13 +123,31 @@ curl -X POST 'https://app.airweave.ai/source-connections' \
   -d '{
   "name": "Sales Team Google Drive",
   "short_name": "google_drive",
-  "provider_readable_id": "my-composio-connection-abc123",
-  "provider_config": {
-    "auth_config_id": "config_xyz789",
-    "account_id": "account_abc123"
+  "authentication": {
+    "provider_readable_id": "my-composio-connection-abc123",
+    "provider_config": {
+      "auth_config_id": "config_xyz789",
+      "account_id": "account_abc123"
+    }
   }
 }'
 ```
+
+<Callout type="warning">
+**Note**: API Validation
+
+The API now performs validation on auth provider source connections:
+
+1. **Provider Existence**: 404 error if the specified `provider_readable_id` doesn't exist
+2. **Source Compatibility**: 400 error if the provider doesn't support the specified source
+
+**Example error response when provider doesn't support a source:**
+```json
+{
+  "detail": "Source 'github' does not support 'composio' as an auth provider. Supported providers: []"
+}
+```
+</Callout>
 </CodeBlocks>
 </Step>
 </Steps>

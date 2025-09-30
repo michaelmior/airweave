@@ -148,28 +148,39 @@ class ResourceLocator:
         """
         supported = []
 
-        # Import auth provider classes
+        # Import and check each auth provider individually
+        # This ensures we can handle partial availability of providers
+        auth_provider_classes = []
+        
+        # Try to import Pipedream
+        try:
+            from airweave.platform.auth_providers.pipedream import PipedreamAuthProvider
+            auth_provider_classes.append(PipedreamAuthProvider)
+        except ImportError:
+            # Skip if provider is not available
+            pass
+            
+        # Try to import Composio
         try:
             from airweave.platform.auth_providers.composio import ComposioAuthProvider
-            from airweave.platform.auth_providers.pipedream import PipedreamAuthProvider
-
-            auth_provider_classes = [PipedreamAuthProvider, ComposioAuthProvider]
-
-            for auth_provider_class in auth_provider_classes:
-                short_name = auth_provider_class._short_name
-
-                # Check if source is blocked
-                blocked_sources = getattr(auth_provider_class, "BLOCKED_SOURCES", [])
-                if source_short_name in blocked_sources:
-                    continue
-
-                # If not blocked, it's supported
-                supported.append(short_name)
-
+            auth_provider_classes.append(ComposioAuthProvider)
         except ImportError:
-            # If auth providers can't be imported, return empty list
-            # This prevents the system from breaking if auth providers are missing
+            # Skip if provider is not available
             pass
+            
+        # Add future providers here with individual try/except blocks
+            
+        # Check each available provider
+        for auth_provider_class in auth_provider_classes:
+            short_name = auth_provider_class._short_name
+
+            # Check if source is blocked
+            blocked_sources = getattr(auth_provider_class, "BLOCKED_SOURCES", [])
+            if source_short_name in blocked_sources:
+                continue
+
+            # If not blocked, it's supported
+            supported.append(short_name)
 
         return supported
 

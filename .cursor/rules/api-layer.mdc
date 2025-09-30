@@ -25,6 +25,21 @@ api/
 - **Public API (SDK)**: `/sources/`, `/collections/`, `/source-connections/`,
 - **Internal Frontend**: `/users/`, `/organizations/`, `/api-keys/`, `/sync/`, `/dag/`, `/entities/`, `/destinations/`
 
+### Key Endpoints
+
+#### Sources API
+- **GET /sources/{short_name}**: Retrieves source details including:
+  - Core metadata (name, description)
+  - Authentication methods (`auth_methods`)
+  - Configuration schemas (`auth_fields`, `config_fields`)
+  - **Auth Provider Support** (`supported_auth_providers`): List of auth provider short names that support this source
+
+#### Source Connections API
+- **POST /source-connections**: Creates a new connection with validation:
+  - For direct auth: validates credential format
+  - For OAuth: handles authorization flows
+  - For auth providers: validates provider exists and supports the source
+
 ## Core Components
 
 ### 1. TrailingSlashRouter

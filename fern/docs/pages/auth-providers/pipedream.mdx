@@ -135,12 +135,14 @@ client = AirweaveSDK(api_key="YOUR_API_KEY")
 source_connection = client.source_connections.create(
     name="Company Notion Workspace",
     short_name="notion",
-    provider_readable_id="my-pipedream-connection-xyz789",  # Your Pipedream connection ID
-    provider_config={
-        "project_id": "proj_JPsD74a",      # From Pipedream
-        "account_id": "apn_gyha5Ky",       # From Pipedream API
-        "external_user_id": "user123",     # Required: unique user identifier
-        "environment": "production",        # Optional, defaults to "production"
+    authentication={
+        "provider_readable_id": "my-pipedream-connection-xyz789",  # Your Pipedream connection ID
+        "provider_config": {
+            "project_id": "proj_JPsD74a",      # From Pipedream
+            "account_id": "apn_gyha5Ky",       # From Pipedream API
+            "external_user_id": "user123",     # Required: unique user identifier
+            "environment": "production",        # Optional, defaults to "production"
+        }
     }
 )
 
@@ -158,12 +160,14 @@ const client = new AirweaveSDKClient({
 const sourceConnection = await client.sourceConnections.create({
   name: "Company Notion Workspace",
   shortName: "notion",
-  providerReadableId: "my-pipedream-connection-xyz789",  // Your Pipedream connection ID
-  providerConfig: {
-    project_id: "proj_JPsD74a",      // From Pipedream
-    account_id: "apn_gyha5Ky",       // From Pipedream API
-    external_user_id: "user123",     // Required: unique user identifier
-    environment: "production",      // Optional, defaults to "production"
+  authentication: {
+    providerReadableId: "my-pipedream-connection-xyz789",  // Your Pipedream connection ID
+    providerConfig: {
+      project_id: "proj_JPsD74a",      // From Pipedream
+      account_id: "apn_gyha5Ky",       // From Pipedream API
+      external_user_id: "user123",     // Required: unique user identifier
+      environment: "production",      // Optional, defaults to "production"
+    }
   }
 });
 
@@ -177,15 +181,33 @@ curl -X POST 'https://app.airweave.ai/source-connections' \
   -d '{
   "name": "Company Notion Workspace",
   "short_name": "notion",
-  "provider_readable_id": "my-pipedream-connection-xyz789",
-  "provider_config": {
-    "project_id": "proj_JPsD74a",
-    "account_id": "apn_gyha5Ky",
-    "environment": "production",
-    "external_user_id": "user123"
+  "authentication": {
+    "provider_readable_id": "my-pipedream-connection-xyz789",
+    "provider_config": {
+      "project_id": "proj_JPsD74a",
+      "account_id": "apn_gyha5Ky",
+      "environment": "production",
+      "external_user_id": "user123"
+    }
   }
 }'
 ```
+
+<Callout type="warning">
+**Note**: API Validation
+
+The API now performs validation on auth provider source connections:
+
+1. **Provider Existence**: 404 error if the specified `provider_readable_id` doesn't exist
+2. **Source Compatibility**: 400 error if the provider doesn't support the specified source
+
+**Example error response when provider doesn't support a source:**
+```json
+{
+  "detail": "Source 'github' does not support 'pipedream' as an auth provider. Supported providers: []"
+}
+```
+</Callout>
 </CodeBlocks>
 </Step>
 </Steps>

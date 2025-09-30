@@ -39,8 +39,8 @@ class ComposioAuthProvider(BaseAuthProvider):
         # Add more mappings as needed
     }
 
-    # Mapping of Airweave source short names to Composio app names
-    # Key: Airweave short name, Value: Composio app name_slug
+    # Mapping of Airweave source short names to Composio toolkit slugs
+    # Key: Airweave short name, Value: Composio toolkit slug
     # Only include mappings where names differ between Airweave and Composio
     SLUG_NAME_MAPPING = {
         "google_drive": "googledrive",
